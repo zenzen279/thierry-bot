@@ -23,7 +23,26 @@ words = readWords().split('\n')
 
 bot = commands.Bot(command_prefix=PREFIX)
 
-curr_games = {}
+class Game:
+    def __init__(self, word):
+        self.word = unidecode.unidecode(word).lower()
+
+class Games:
+    list = {}
+
+    def __str__(self) -> str:
+        return f"{len(self.list)} parties actives"
+
+    def start(self, key: str, word: str) -> None:
+        self.list[key] = Game(word)
+
+    def get(self, key: str) -> Game:
+        return self.list[key]
+
+    def includes(self, key: str) -> bool:
+        return key in list(self.list.keys())
+
+games = Games()
 
 @bot.event
 async def on_ready():
@@ -41,9 +60,7 @@ async def start(ctx: Context):
 
     random_word = choice(words)
 
-    curr_games[ctx.channel.id] = {
-        "word": unidecode.unidecode(random_word).lower()
-    }
+    games.start(ctx.channel.id, random_word)
     
     await ctx.send(f"Entrez un mot de {len(random_word)} lettres")
 
@@ -59,10 +76,10 @@ async def on_message(message: Message):
         return await bot.process_commands(message)
 
     # Pass message if no active games in channel
-    if not message.channel.id in list(curr_games.keys()):
+    if not games.includes(message.channel.id):
         return
 
-    random_word = curr_games[message.channel.id]['word']
+    random_word = games.get(message.channel.id).word
 
     # Pass if the length of the word is not the same as the random_word 
     if len(message.content) != len(random_word):
@@ -107,7 +124,7 @@ async def on_message(message: Message):
 
 @bot.command()
 async def triche(ctx:Context):
-    await ctx.channel.send(curr_games[ctx.channel.id]['word'])
+    await ctx.channel.send(games.get(ctx.channel.id).word)
 
 # @bot.command()
 # async def test(ctx: Context):
