@@ -23,6 +23,8 @@ words = readWords().split('\n')
 
 bot = commands.Bot(command_prefix=PREFIX)
 
+# TODO: Store the highest guess in Game class, (Score + 1 when a letter is good else score +.25)
+
 class Game:
     def __init__(self, word):
         self.word = unidecode.unidecode(word).lower()
@@ -33,8 +35,19 @@ class Games:
     def __str__(self) -> str:
         return f"{len(self.list)} parties actives"
 
-    def start(self, key: str, word: str) -> None:
+    def start(self, key: str, word: str) -> bool:
+        if self.includes(key): 
+            return False
+
         self.list[key] = Game(word)
+        return True
+
+    def stop(self, key: str) -> bool:
+        try:
+            del self.list[key]
+            return True
+        except:
+            return False
 
     def get(self, key: str) -> Game:
         return self.list[key]
@@ -56,14 +69,29 @@ async def ping(ctx: Context):
 
 @bot.command(aliases=['s', "startGame","ZEPARTIZEPARTI"])
 async def start(ctx: Context):
-    await ctx.send("Démarrage de la partie. Mo Mo Motus !")
-
     random_word = choice(words)
 
-    games.start(ctx.channel.id, random_word)
+    res = games.start(ctx.channel.id, random_word)
     
-    await ctx.send(f"Entrez un mot de {len(random_word)} lettres")
+    if res:
+        await ctx.send("Démarrage de la partie. Mo Mo Motus !")
+        await ctx.send(f"Entrez un mot de {len(random_word)} lettres")
+    else:
+        await ctx.send("Il y a deja une partie en cours !")
 
+@bot.command()
+async def stop(ctx: Context):
+    if not games.includes(ctx.channel.id):
+        return await ctx.send("Il n'y a pas de parties en cours")
+
+    res = games.stop(ctx.channel.id)
+
+    if res:
+        await ctx.send("Partie terminée !")
+    else:
+        await ctx.send("Erreur durant l'arret de la partie.")
+    
+    
 
 @bot.event
 async def on_message(message: Message):
