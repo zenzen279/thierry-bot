@@ -39,73 +39,76 @@ async def ping(ctx: Context):
 async def start(ctx: Context):
     await ctx.send("Démarrage de la partie. Mo Mo Motus !")
 
-    mot = choice(words)
+    random_word = choice(words)
 
-    curr_games[ctx.guild.id] = {
-        "mot": unidecode.unidecode(mot)
+    curr_games[ctx.channel.id] = {
+        "word": unidecode.unidecode(random_word).lower()
     }
     
-    await ctx.send(f"Entrez un mot de {len(mot)} lettres")
+    await ctx.send(f"Entrez un mot de {len(random_word)} lettres")
 
-
-# _ _ _ _ _ _ _
-# J O U R N A L
-# _ O u _ n _ _
 
 @bot.event
 async def on_message(message: Message):
+    # Pass message by bot
     if message.author == bot.user:
         return
 
+    # Pass message not starting with prefix
     if message.content.startswith(PREFIX):
         return await bot.process_commands(message)
 
-    if not message.guild.id in list(curr_games.keys()):
-        return
-        
-    if len(message.content) != len(curr_games[message.guild.id]['mot']):
+    # Pass message if no active games in channel
+    if not message.channel.id in list(curr_games.keys()):
         return
 
-    mot = message.content
+    random_word = curr_games[message.channel.id]['word']
 
-    mot_mot = curr_games[message.guild.id]['mot']
+    # Pass if the length of the word is not the same as the random_word 
+    if len(message.content) != len(random_word):
+        return
 
-    mot_mot2 = list(mot_mot)
+    mot = message.content.lower()
+
+    # Create a list with every valid letters
+    list_letters = list(random_word)
+
+    # [-, -, -, -, -, -]
+    result = ["-" for i in range(len(random_word))]
+
+
+    # Set all correctly placed letters
+    for i, letter in enumerate(mot):  
+        # If letter is correctly placed
+        if letter == random_word[i]:
+            # Remove letter from list
+            index = list_letters.index(letter)
+            list_letters.pop(index)
+
+            # Replace - with valid letter 
+            result[i] =  f":regional_indicator_{letter}:" 
     
-    mot_to_send = []
-
-    # RNAL
-    # JOURANJN
-    #ENFANT
-    #6N66OT
-
-
-    # lepiot
-    # mouffle
-    
-    for i in range(len(mot)):    
-        if mot[i].lower() == mot_mot[i].lower():
-            index = mot_mot2.index(mot[i])
-            mot_mot2.pop(index)
-
-            mot_to_send.append(f" :regional_indicator_{mot[i].lower()}: ")
-        else:
-            mot_to_send.append(" - ")
-
-    for i in range(len(mot)):   
-        if any(mo for mo in mot_mot2 if mo.lower() == mot[i].lower()):
-            if mot_to_send[i].startswith(" :regional_indicator_"):
+    # Set all letters not correctly placed
+    for i, letter in enumerate(mot):  
+        # If letter is in the list of correct letters
+        if letter in list_letters:
+            # If letter is already placed continue
+            if result[i].startswith(":regional_indicator_"):
                 continue
-            
-            index = mot_mot2.index(mot[i])
-            mot_mot2.pop(index)
-            mot_to_send[i] = f" {mot[i].lower()} "
 
-    await message.channel.send("".join(mot_to_send))
+            # Remove letter from list
+            index = list_letters.index(letter)
+            list_letters.pop(index)
+
+            # Replace - with incorrectly placed letter
+            result[i] = f"{letter}"
+
+    await message.channel.send(" ".join(result))
 
 @bot.command()
 async def triche(ctx:Context):
-    await ctx.channel.send(curr_games[ctx.guild.id]['mot'])
+    await ctx.channel.send(curr_games[ctx.channel.id]['word'])
+
 # @bot.command()
 # async def test(ctx: Context):
 #     emoji = "<:g_letter:905855821735399455>"
