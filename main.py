@@ -250,14 +250,14 @@ async def on_message(message: Message):
     if not games.includes(message.channel.id):
         return
 
-    if not msg in french_words:
-        return await message.channel.send("Le mot que vous avez écrit n'est pas français.")
-
     random_word = games.get(message.channel.id).word
 
     # Pass if the length of the word is not the same as the random_word
     if len(msg) != len(random_word):
         return
+
+    if not msg in french_words:
+        return await message.channel.send("Le mot que vous avez écrit n'est pas français.")
 
 
     current_game = games.get(message.channel.id)
