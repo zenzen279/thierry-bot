@@ -6,7 +6,7 @@ from discord import Embed, Color
 
 import unidecode
 
-from os import getenv, read
+from os import getenv
 from dotenv import load_dotenv
 
 from readWords import readWords
