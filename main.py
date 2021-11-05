@@ -312,7 +312,7 @@ async def on_message(message: Message):
 
     if msg == current_game.word:
         games.stop(message.channel.id)
-        return await message.channel.send("Bravo !!! Vous avez gagner !!!")
+        return await message.channel.send("Bravo !!! Vous avez gagné !!!")
 
     if len(current_game.history) >= current_game.limit:
         await message.channel.send(f"Partie términée ! Le mot etait: {current_game.word}")
