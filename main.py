@@ -317,7 +317,7 @@ async def on_message(message: Message):
         games.stop(message.channel.id)
         return await message.channel.send("Bravo !!! Vous avez gagné !!!")
 
-    if len(current_game.current) >= current_game.limit:
+    if current_game.current >= current_game.limit:
         await message.channel.send(f"Partie términée ! Le mot etait: {current_game.word}")
         games.stop(message.channel.id)
 
