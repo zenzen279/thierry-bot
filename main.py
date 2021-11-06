@@ -9,7 +9,7 @@ import unidecode
 from os import getenv
 from dotenv import load_dotenv
 
-from readWords import readWords, readWordsJSON
+from readWords import readWordsJSON
 
 from random import choice
 
@@ -20,7 +20,9 @@ DISCORD_TOKEN = getenv("DISCORD_TOKEN")
 PREFIX = ";"
 
 
-french_words = [unidecode.unidecode(word).lower() for word in readWords().split("\n")]
+french_words = [unidecode.unidecode(word).lower() for word in readWordsJSON("./words.json")]
+
+print(len(french_words))
 
 words = readWordsJSON()
 
