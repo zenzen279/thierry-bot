@@ -33,6 +33,7 @@ class Game:
     def __init__(self, word, limit: int = 10):
         self.word = unidecode.unidecode(word).lower()
         self.limit = limit
+        self.current = 0
         self.history = []
         self.correct = [
             "<:BLEU:906229080985317398>" for i in range(len(self.word))]
@@ -305,6 +306,8 @@ async def on_message(message: Message):
     historique = current_game.history
     historique.append(result_str)
 
+    current_game.current += 1
+
     if len(historique) > 2:
         historique.pop(0)
 
@@ -314,7 +317,7 @@ async def on_message(message: Message):
         games.stop(message.channel.id)
         return await message.channel.send("Bravo !!! Vous avez gagné !!!")
 
-    if len(current_game.history) >= current_game.limit:
+    if len(current_game.current) >= current_game.limit:
         await message.channel.send(f"Partie términée ! Le mot etait: {current_game.word}")
         games.stop(message.channel.id)
 
