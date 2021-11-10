@@ -20,11 +20,7 @@ DISCORD_TOKEN = getenv("DISCORD_TOKEN")
 PREFIX = ";"
 
 
-french_words = [unidecode.unidecode(word).lower() for word in readWordsJSON("./words.json")]
-
-print(len(french_words))
-
-words = readWordsJSON()
+words = [unidecode.unidecode(word).lower() for word in readWordsJSON("./words.json")]
 
 bot = commands.Bot(command_prefix=PREFIX)
 
@@ -259,7 +255,7 @@ async def on_message(message: Message):
     if len(msg) != len(random_word):
         return
 
-    if not msg in french_words:
+    if not msg in words:
         return await message.channel.send("Le mot que vous avez écrit n'est pas français.")
 
 
