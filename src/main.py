@@ -8,8 +8,9 @@ from dotenv import load_dotenv
 from random import choice
 
 from readWords import readWordsJSON
-from Enums import RedLetters, YellowLetters, BlueLetters, FilteredWordsLambdas
-
+from Enums import RedLetters, YellowLetters, BlueLetters
+from Classes.game import Game, games
+from utils import *
 
 load_dotenv()
 
@@ -20,61 +21,22 @@ words = readWordsJSON("../public/words.json")
 
 bot = commands.Bot(command_prefix=PREFIX)
 
-games = {}
-
-class Game:
-    def __init__(self, id,  word, limit: int = 10):
-        self.id = id
-        self.word = word
-        self.limit = limit
-        self.current = 0
-        self.history = []
-        self.correct = [BlueLetters.EMPTY for i in range(len(self.word))]
-        
-        games[id] = self
-    
-    def delete(self):
-        del games[self.id]
-
-    def setRandomCorrectLetters(self, n: int):
-        for i in range(n):
-            letter = choice(self.word)
-            index = self.word.index(letter)
-            self.correct[index] = RedLetters[letter]
-        
-    def correctLettersToString(self):
-        return " ".join(self.correct)
 
 @bot.event
 async def on_ready():
     print("HELLO WORLDOU")
 
-
 @bot.command()
 async def ping(ctx: Context):
     await ctx.channel.send(choice(words))
 
-def doesGameExist(id):
-    curr_game = games.get(id, None)
-
-    if curr_game is None:
-        return False
-        
-    return True
-
-def getRandomWordByDifficulty(difficulty: str):
-    filtered_words = list(filter(FilteredWordsLambdas[difficulty], words))
-
-    random_word = choice(filtered_words)  
-
-    return random_word
-
 @bot.command(aliases=['s', "startGame", "ZEPARTIZEPARTI"])
 async def start(ctx: Context, difficulty: str = "medium"):
-    if not doesGameExist(ctx.channel.id):
+    if doesGameExist(games, ctx.channel.id):
         await ctx.send("Il y a deja une partie en cours !")
+        return
     
-    random_word = getRandomWordByDifficulty(difficulty)
+    random_word = getRandomWordByDifficulty(words, difficulty)
 
     game = Game(ctx.channel.id, random_word)
 
@@ -86,16 +48,15 @@ async def start(ctx: Context, difficulty: str = "medium"):
         
 @bot.command()
 async def stop(ctx: Context):
-    if not games.includes(ctx.channel.id):
-        return await ctx.send("Il n'y a pas de parties en cours")
+    if not doesGameExist(games, ctx.channel.id):
+        await ctx.send("Il n'y a pas de partie en cours")
+        return
+        
+    game = games.get(ctx.channel.id)
 
-    res = games.stop(ctx.channel.id)
+    game.stop
 
-    if res:
-        await ctx.send("Partie terminée !")
-    else:
-        await ctx.send("Erreur durant l'arret de la partie.")
-
+    await ctx.send("Partie terminée !")
 
 @bot.event
 async def on_message(message: Message):
@@ -110,7 +71,7 @@ async def on_message(message: Message):
         return await bot.process_commands(message)
 
     # Pass message if no active games in channel
-    if not games.includes(message.channel.id):
+    if not games.get(message.channel.id):
         return
 
     random_word = games.get(message.channel.id).word
@@ -123,7 +84,7 @@ async def on_message(message: Message):
         return await message.channel.send("Le mot que vous avez écrit n'est pas français.")
 
 
-    current_game = games.get(message.channel.id)
+    game = games.get(message.channel.id)
 
     # Create a list with every valid letters
     list_letters = list(random_word)
@@ -143,7 +104,7 @@ async def on_message(message: Message):
 
             letter_append = RedLetters[letter]
 
-            current_game.correct[i] = letter_append
+            game.correct[i] = letter_append
             result[i] = letter_append
 
         else:
@@ -154,7 +115,7 @@ async def on_message(message: Message):
         # If letter is in the list of correct letters
         if letter in list_letters:
             # If letter is already placed continue
-            if result[i].startswith("<:"):
+            if type(result[i]) != BlueLetters:
                 continue
 
             # Remove letter from list
@@ -163,25 +124,23 @@ async def on_message(message: Message):
 
             # Replace - with incorrectly placed letter
             result[i] = YellowLetters[letter]
+            
+    historique = game.history
+    historique.append(result)
 
-    result_str = " ".join(result)
-
-    historique = current_game.history
-    historique.append(result_str)
-
-    current_game.current += 1
+    game.current += 1
 
     if len(historique) > 2:
         historique.pop(0)
 
-    await message.channel.send("\n".join(historique) + "\n" + " ".join(current_game.correct))
+    await message.channel.send(game.historyToString())
 
-    if msg == current_game.word:
-        games.stop(message.channel.id)
-        return await message.channel.send("Bravo !!! Vous avez gagné !!!")
+    if msg == game.word:
+        game.delete()
+        return await message.channel.send(getRandomPhrase(message.author))
 
-    if current_game.current >= current_game.limit:
-        await message.channel.send(f"Partie términée ! Le mot etait: {current_game.word}")
-        games.stop(message.channel.id)
+    if game.current >= game.limit:
+        await message.channel.send(f"Partie terminée ! Le mot était: {game.word}")
+        game.delete()
 
 bot.run(DISCORD_TOKEN)
