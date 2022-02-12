@@ -12,7 +12,7 @@ def writeJSON(list, path: str = "./words.json") -> bool:
 def fetch():
     data = requests.get("https://frenchwordsapi.herokuapp.com/api/Word").json()
 
-    print("L'api a reussis a chargé (jure wallah)")
+    print("L'api a reussi à charger (jure wallah)")
 
     words_list = []
     for word_obj in data:
@@ -24,7 +24,7 @@ def fetch():
     res = writeJSON(words_list)
 
     if res:
-        print("Ecriture : Reussi")
+        print("Ecriture : Reussie")
     else:
         print("Ecriture : Erreur")
     
