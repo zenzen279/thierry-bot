@@ -1,4 +1,7 @@
+import requests
+
 from random import choice
+from bs4 import BeautifulSoup
 
 def doesGameExist(games, id):
     curr_game = games.get(id, None)
@@ -34,8 +37,16 @@ def getRandomPhrase(user):
     
     return choice(phrases)
 
+
 def getDefinition(word):
-    pass
+    try:
+        url = f"https://fr.wiktionary.org/wiki/{word}"
+        page = requests.get(url)
+        soup = BeautifulSoup(page.content, 'html.parser')
+        s = soup.find("ol").find_all("li")
+        return f"La définition de {word} est: {s[0].getText()}"
+    except:
+        return "Zé pas trouvé la définition, désolé."
 
 difficulty_filters = {
     "easy": lambda x: (len(x) < 6),
