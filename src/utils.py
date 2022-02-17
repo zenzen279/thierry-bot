@@ -43,9 +43,20 @@ def getDefinition(word):
         url = f"https://fr.wiktionary.org/wiki/{word}"
         page = requests.get(url)
         soup = BeautifulSoup(page.content, 'html.parser')
-        s = soup.find("ol").find_all("li")
-        return f"La définition de {word} est: {s[0].getText()}"
-    except:
+        s = BeautifulSoup(str(soup.ol.li).split("<ul>")[0], 'html.parser')
+        if "personne du" not in s.text.lower():
+            return f"La définition de {word} est: {s.text}"
+        try:
+            url = "https://fr.wiktionary.org" + s.find("a")["href"]
+            word2 = s.find("a").text
+            page = requests.get(url)
+            soup = BeautifulSoup(page.content, 'html.parser')
+            ss = BeautifulSoup(str(soup.ol.li).split("<ul>")[0], 'html.parser')
+            definition2 = ss.getText().split("\n")[0]
+            return f"La définition de {word} est: {s.getText()}\n La définition de {word2} est: {definition2}"
+        except:
+            return f"La définition de {word} est: {s.getText()}"
+    except Exception as e:
         return "Zé pas trouvé la définition, désolé."
 
 difficulty_filters = {

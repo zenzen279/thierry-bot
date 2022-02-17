@@ -10,4 +10,4 @@ def readWordsJSON(path: str):
     
     with open(path, "r", encoding="utf-8") as file:
         words = json.load(file)
-        return [unidecode(word).lower() for word in words]
+        return [unidecode(word.lower()) for word in words], {unidecode(word.lower()): word.lower() for word in words}

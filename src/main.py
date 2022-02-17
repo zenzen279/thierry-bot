@@ -17,7 +17,7 @@ load_dotenv()
 DISCORD_TOKEN = getenv("DISCORD_TOKEN")
 PREFIX = ";"
 
-words = readWordsJSON("../public/words.json")
+words, dict_words_accents = readWordsJSON("../public/words.json")
 
 bot = commands.Bot(command_prefix=PREFIX)
 
@@ -46,6 +46,12 @@ async def start(ctx: Context, difficulty: str = "medium"):
     await ctx.send(f"Entrez un mot de {len(random_word)} lettres")
     await ctx.send(game.correctLettersToString())
         
+@bot.command()
+async def test(ctx: Context, difficulty: str = "medium"):    
+    random_word = getRandomWordByDifficulty(words, difficulty)
+    await ctx.channel.send((random_word))
+    await ctx.channel.send(getDefinition(dict_words_accents.get(random_word)))
+
 @bot.command()
 async def stop(ctx: Context):
     if not doesGameExist(games, ctx.channel.id):
@@ -138,7 +144,7 @@ async def on_message(message: Message):
     if msg == game.word:
         game.delete()
         await message.channel.send(getRandomPhrase(message.author))
-        await message.channel.send(getDefinition(game.word))
+        await message.channel.send(getDefinition(dict_words_accents.get(game.word)))
         return
 
     if game.current >= game.limit:

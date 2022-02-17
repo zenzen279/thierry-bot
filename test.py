@@ -27,12 +27,24 @@
 import requests
 from bs4 import BeautifulSoup
 
-word = "gord"
+word = "septuple"
 try:
     url = f"https://fr.wiktionary.org/wiki/{word}"
     page = requests.get(url)
     soup = BeautifulSoup(page.content, 'html.parser')
     s = soup.find("ol").find_all("li")
+    ss = s[0].getText()
+    if "personne du" in ss.lower():
+        try:
+            print(s[0].find("a")["href"])
+            url = "https://fr.wiktionary.org" + s[0].find("a")["href"]
+            page = requests.get(url)
+            soup = BeautifulSoup(page.content, 'html.parser')
+            sss = soup.find("ol").find_all("li")
+            print(sss[0].getText().split("\n")[0])
+        except:
+            #print(ss)
+            pass
     print(s[0].getText())
 except:
     print("Zé pas trouvé désolé")
