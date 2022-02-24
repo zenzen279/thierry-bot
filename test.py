@@ -27,26 +27,38 @@
 import requests
 from bs4 import BeautifulSoup
 
-word = "septuple"
-try:
-    url = f"https://fr.wiktionary.org/wiki/{word}"
+word = "établons"
+
+def scrapDefinition(url: str) -> list[str]:
+    # Liste des bouts de phrases ou l'on doit refaire un scrapping pour trouver la bonne définition
+    redos = ["pluriel de", "personne du", "participe passé"]
+
     page = requests.get(url)
     soup = BeautifulSoup(page.content, 'html.parser')
-    s = soup.find("ol").find_all("li")
-    ss = s[0].getText()
-    if "personne du" in ss.lower():
-        try:
-            print(s[0].find("a")["href"])
-            url = "https://fr.wiktionary.org" + s[0].find("a")["href"]
-            page = requests.get(url)
-            soup = BeautifulSoup(page.content, 'html.parser')
-            sss = soup.find("ol").find_all("li")
-            print(sss[0].getText().split("\n")[0])
-        except:
-            #print(ss)
-            pass
-    print(s[0].getText())
-except:
-    print("Zé pas trouvé désolé")
+
+    # Tout les li contenant des définitions
+    definitions = soup.find("ol").find_all("li")
+
+    definition = definitions[0]
+    definition_text = definition.getText()
+
+    # Si une string de la liste redos est dans la définition
+    if any(redo for redo in redos if redo in definition_text.lower()):
+        parent_url = "https://fr.wiktionary.org" + definition.find("a")["href"]
+        return scrapDefinition(parent_url)
+
+    # Liste de string avec tout les définition
+    definitions_list = [definition.getText() for definition in definitions]
+
+    return definitions_list[:5]
+        
+def findDefinitions(word: str): 
+    url = f"https://fr.wiktionary.org/w/index.php?search={word}"
+    try:
+        return scrapDefinition(url)
+    except:
+        return None
+
+print(findDefinitions(word))
 
 

@@ -37,27 +37,32 @@ def getRandomPhrase(user):
     
     return choice(phrases)
 
+def scrapDefinition(url: str) -> list[str]:
+    # Liste des bouts de phrases ou l'on doit refaire un scrapping pour trouver la bonne définition
+    redos = ["pluriel de", "personne du", "du verbe"]
 
-def getDefinition(word):
+    page = requests.get(url)
+    soup = BeautifulSoup(page.content, 'html.parser')
+
+    # Tout les li contenant des définitions
+    definitions = soup.find("ol").find_all("li")
+
+    definition = definitions[0]
+    definition_text = definition.getText()
+
+    # Si une string de la liste redos est dans la définition
+    if any(redo for redo in redos if redo in definition_text.lower()):
+        parent_url = "https://fr.wiktionary.org" + definition.find("a")["href"]
+        return scrapDefinition(parent_url)
+
+    return definition_text
+        
+def findDefinitions(word: str): 
+    url = f"https://fr.wiktionary.org/w/index.php?search={word}"
     try:
-        url = f"https://fr.wiktionary.org/wiki/{word}"
-        page = requests.get(url)
-        soup = BeautifulSoup(page.content, 'html.parser')
-        s = BeautifulSoup(str(soup.ol.li).split("<ul>")[0], 'html.parser')
-        if "personne du" not in s.text.lower():
-            return f"La définition de {word} est: {s.text}"
-        try:
-            url = "https://fr.wiktionary.org" + s.find("a")["href"]
-            word2 = s.find("a").text
-            page = requests.get(url)
-            soup = BeautifulSoup(page.content, 'html.parser')
-            ss = BeautifulSoup(str(soup.ol.li).split("<ul>")[0], 'html.parser')
-            definition2 = ss.getText().split("\n")[0]
-            return f"La définition de {word} est: {s.getText()}\n La définition de {word2} est: {definition2}"
-        except:
-            return f"La définition de {word} est: {s.getText()}"
-    except Exception as e:
-        return "Zé pas trouvé la définition, désolé."
+        return scrapDefinition(url)
+    except:
+        return "Franchement même le bot a pas trouvé la définition donc c'est pas grave si t'as pas trouvé."
 
 difficulty_filters = {
     "easy": lambda x: (len(x) < 6),

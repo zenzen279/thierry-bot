@@ -49,8 +49,8 @@ async def start(ctx: Context, difficulty: str = "medium"):
 @bot.command()
 async def test(ctx: Context, difficulty: str = "medium"):    
     random_word = getRandomWordByDifficulty(words, difficulty)
-    await ctx.channel.send((random_word))
-    await ctx.channel.send(getDefinition(dict_words_accents.get(random_word)))
+    await ctx.channel.send(dict_words_accents.get(random_word))
+    await ctx.channel.send(findDefinitions(dict_words_accents.get(random_word)))
 
 @bot.command()
 async def stop(ctx: Context):
@@ -144,7 +144,7 @@ async def on_message(message: Message):
     if msg == game.word:
         game.delete()
         await message.channel.send(getRandomPhrase(message.author))
-        await message.channel.send(getDefinition(dict_words_accents.get(game.word)))
+        await message.channel.send(findDefinitions(dict_words_accents.get(game.word)))
         return
 
     if game.current >= game.limit:
