@@ -12,7 +12,10 @@ def doesGameExist(games, id):
     return True
 
 def enumsToString(enum_list):
-    return " ".join(map(lambda l: l.value,enum_list))
+    print("1")
+    tutu = " ".join(map(lambda l: l.value, enum_list))
+    print("2")
+    return tutu
 
 def getRandomWordByDifficulty(words, difficulty: str):
     filter_enum = difficulty_filters[difficulty]
@@ -24,9 +27,6 @@ def getRandomWordByDifficulty(words, difficulty: str):
     return random_word
     
 def getRandomPhrase(user):
-    if user.id == 346417942575185922:
-        return "Wow bravo Mélanie tu es vraiment très forte, ça me fait très plaisir que tu joues à mon jeu."
-
     phrases = [
         f"Bravo {user.name}, tu as trouvé le mot.",
         f"C'est presque trop facile pour toi {user.name}, bravo.",
@@ -38,6 +38,8 @@ def getRandomPhrase(user):
     return choice(phrases)
 
 def scrapDefinition(url: str) -> list[str]:
+    print("scrapDefinition")
+    print(url)
     # Liste des bouts de phrases ou l'on doit refaire un scrapping pour trouver la bonne définition
     redos = ["pluriel de", "personne du", "du verbe"]
 
@@ -46,7 +48,7 @@ def scrapDefinition(url: str) -> list[str]:
 
     # Tout les li contenant des définitions
     definitions = soup.find("ol").find_all("li")
-
+    print(definitions)
     definition = definitions[0]
     definition_text = definition.getText()
 
