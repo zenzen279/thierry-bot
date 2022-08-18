@@ -31,7 +31,7 @@ async def on_ready():
     bot.server = server.HTTPServer(
         bot=bot,
         host="0.0.0.0",
-        port="80",
+        port="10000",
     )
     await bot.server.start()
     print("Go!")
