@@ -3,6 +3,10 @@ Le bot original ne fonctionne plus donc voici un fork avec un beau readme sur co
 
 J'ai effectué quelques corrections et améliorations. Si ce fork vous plaît, n'hésitez pas à mettre une étoile ⭐ sur GitHub.
 
+N'ayant pas pu récupéré les icones d'origine, les assets fournis sont des versions modifiées d'icones réalisées par https://www.customicondesign.com
+
+De plus, j'ai ajouté un serveur web pour que l'app puisse tourner en continu et être déployée sur Render.
+
 ## Commandes
   - `;help` Affiche l'aide.
   - `;start difficulty` Démarre une partie de Motus. Le paramètre `difficulty` peut prendre les valeurs:

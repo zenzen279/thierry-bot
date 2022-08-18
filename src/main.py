@@ -12,6 +12,9 @@ from Enums import RedLetters, YellowLetters, BlueLetters
 from Classes.game import Game, games
 from utils import *
 
+import server
+from aiohttp import web
+
 load_dotenv()
 
 DISCORD_TOKEN = getenv("DISCORD_TOKEN")
@@ -21,10 +24,16 @@ words, dict_words_accents = readWordsJSON("../public/words.json")
 
 bot = commands.Bot(command_prefix=PREFIX)
 
-
 @bot.event
 async def on_ready():
-    print("HELLO WORLDOU")
+    print("Ready?")
+    bot.server = server.HTTPServer(
+        bot=bot,
+        host="0.0.0.0",
+        port="8000",
+    )
+    await bot.server.start()
+    print("Go!")
 
 @bot.command()
 async def ping(ctx: Context):
@@ -150,5 +159,9 @@ async def on_message(message: Message):
     if game.current >= game.limit:
         await message.channel.send(f"Partie terminée ! Le mot était: {game.word}")
         game.delete()
+
+@server.add_route(path="/", method="GET")
+async def home(request):
+    return web.json_response(data={"foo": "bar"}, status=200)  
 
 bot.run(DISCORD_TOKEN)
