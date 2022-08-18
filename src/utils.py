@@ -37,7 +37,7 @@ def getRandomPhrase(user):
     
     return choice(phrases)
 
-def scrapDefinition(url: str) -> list[str]:
+def scrapDefinition(url: str):
     print("scrapDefinition")
     print(url)
     # Liste des bouts de phrases ou l'on doit refaire un scrapping pour trouver la bonne définition
