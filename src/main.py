@@ -55,12 +55,12 @@ async def test(ctx: Context, difficulty: str = "medium"):
 @bot.command()
 async def stop(ctx: Context):
     if not doesGameExist(games, ctx.channel.id):
-        await ctx.send("Il n'y a pas de partie en cours")
+        await ctx.send("Il n'y a pas de partie en cours.")
         return
         
     game = games.get(ctx.channel.id)
 
-    game.stop
+    game.delete()
 
     await ctx.send("Partie terminée !")
 
