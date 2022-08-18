@@ -18,6 +18,7 @@ from aiohttp import web
 load_dotenv()
 
 DISCORD_TOKEN = getenv("DISCORD_TOKEN")
+
 PREFIX = ";"
 
 words, dict_words_accents = readWordsJSON("../public/words.json")
@@ -30,7 +31,7 @@ async def on_ready():
     bot.server = server.HTTPServer(
         bot=bot,
         host="0.0.0.0",
-        port="8000",
+        port="80",
     )
     await bot.server.start()
     print("Go!")
@@ -163,5 +164,9 @@ async def on_message(message: Message):
 @server.add_route(path="/", method="GET")
 async def home(request):
     return web.json_response(data={"foo": "bar"}, status=200)  
+
+@server.add_route(path="/healthcheck", method="GET")
+async def home(request):
+    return web.json_response(status=200)  
 
 bot.run(DISCORD_TOKEN)
