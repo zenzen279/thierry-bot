@@ -19,11 +19,12 @@ load_dotenv()
 
 DISCORD_TOKEN = getenv("DISCORD_TOKEN")
 
-PREFIX = ";"
+PREFIX = "/"
 
 words, dict_words_accents = readWordsJSON("../public/words.json")
 
 bot = commands.Bot(command_prefix=PREFIX)
+
 
 @bot.event
 async def on_ready():
@@ -36,16 +37,18 @@ async def on_ready():
     await bot.server.start()
     print("Go!")
 
+
 @bot.command()
 async def ping(ctx: Context):
     await ctx.channel.send(choice(words))
 
-@bot.command(aliases=['s', "startGame", "ZEPARTIZEPARTI"])
+
+@bot.command(aliases=["s", "startGame", "ZEPARTIZEPARTI"])
 async def start(ctx: Context, difficulty: str = "medium"):
     if doesGameExist(games, ctx.channel.id):
         await ctx.send("Il y a deja une partie en cours !")
         return
-    
+
     random_word = getRandomWordByDifficulty(words, difficulty)
 
     game = Game(ctx.channel.id, random_word)
@@ -55,24 +58,27 @@ async def start(ctx: Context, difficulty: str = "medium"):
     await ctx.send("Démarrage de la partie. Mo Mo Motus !")
     await ctx.send(f"Entrez un mot de {len(random_word)} lettres")
     await ctx.send(game.correctLettersToString())
-        
+
+
 @bot.command()
-async def test(ctx: Context, difficulty: str = "medium"):    
+async def test(ctx: Context, difficulty: str = "medium"):
     random_word = getRandomWordByDifficulty(words, difficulty)
     await ctx.channel.send(dict_words_accents.get(random_word))
     await ctx.channel.send(findDefinitions(dict_words_accents.get(random_word)))
+
 
 @bot.command()
 async def stop(ctx: Context):
     if not doesGameExist(games, ctx.channel.id):
         await ctx.send("Il n'y a pas de partie en cours.")
         return
-        
+
     game = games.get(ctx.channel.id)
 
     game.delete()
 
     await ctx.send("Partie terminée !")
+
 
 @bot.event
 async def on_message(message: Message):
@@ -97,8 +103,9 @@ async def on_message(message: Message):
         return
 
     if not msg in words:
-        return await message.channel.send("Le mot que vous avez écrit n'est pas français.")
-
+        return await message.channel.send(
+            "Le mot que vous avez écrit n'est pas français."
+        )
 
     game = games.get(message.channel.id)
 
@@ -140,7 +147,7 @@ async def on_message(message: Message):
 
             # Replace - with incorrectly placed letter
             result[i] = YellowLetters[letter]
-            
+
     historique = game.history
     historique.append(result)
 
@@ -158,15 +165,18 @@ async def on_message(message: Message):
         return
 
     if game.current >= game.limit:
-        await message.channel.send(f"Partie terminée ! Le mot était: {game.word}")
+        await message.channel.send(f"Partie terminée ! Le mot était: {game.word}.")
         game.delete()
+
 
 @server.add_route(path="/", method="GET")
 async def home(request):
-    return web.json_response(data={"foo": "bar"}, status=200)  
+    return web.json_response(data={"foo": "bar"}, status=200)
+
 
 @server.add_route(path="/healthcheck", method="GET")
 async def home(request):
-    return web.json_response(status=200)  
+    return web.json_response(status=200)
+
 
 bot.run(DISCORD_TOKEN)

@@ -4,17 +4,18 @@ from utils import enumsToString
 
 games = {}
 
+
 class Game:
-    def __init__(self, id,  word, limit: int = 10):
+    def __init__(self, id, word, limit: int = 10):
         self.id = id
         self.word = word
         self.limit = limit
         self.current = 0
         self.history = []
         self.correct = [BlueLetters.EMPTY for i in range(len(self.word))]
-        
+
         games[id] = self
-    
+
     def delete(self):
         del games[self.id]
 
@@ -28,6 +29,6 @@ class Game:
         return enumsToString(self.correct)
 
     def historyToString(self):
-        enums = "\n".join(map(enumsToString,self.history))
+        enums = "\n".join(map(enumsToString, self.history))
         correct_letters = "\n" + self.correctLettersToString()
         return enums + correct_letters

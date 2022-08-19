@@ -1,16 +1,16 @@
 # from pytrends.request import TrendReq
 # from src.readWords import readWordsJSON
 
-# pytrends = TrendReq(hl='fr', tz=360) 
+# pytrends = TrendReq(hl='fr', tz=360)
 
 
 # def getResult(words):
-#     kw_list = words # list of keywords to get data 
+#     kw_list = words # list of keywords to get data
 
-#     a = pytrends.build_payload(kw_list, cat=0, timeframe='today 12-m', geo="FR") 
+#     a = pytrends.build_payload(kw_list, cat=0, timeframe='today 12-m', geo="FR")
 
-#     data = pytrends.interest_over_time() 
-#     data = data.reset_index() 
+#     data = pytrends.interest_over_time()
+#     data = data.reset_index()
 #     #print(data)
 #     if data.empty:
 #         return 0
@@ -29,12 +29,13 @@ from bs4 import BeautifulSoup
 
 word = "établons"
 
+
 def scrapDefinition(url: str) -> list[str]:
     # Liste des bouts de phrases ou l'on doit refaire un scrapping pour trouver la bonne définition
     redos = ["pluriel de", "personne du", "participe passé"]
 
     page = requests.get(url)
-    soup = BeautifulSoup(page.content, 'html.parser')
+    soup = BeautifulSoup(page.content, "html.parser")
 
     # Tout les li contenant des définitions
     definitions = soup.find("ol").find_all("li")
@@ -51,14 +52,14 @@ def scrapDefinition(url: str) -> list[str]:
     definitions_list = [definition.getText() for definition in definitions]
 
     return definitions_list[:5]
-        
-def findDefinitions(word: str): 
+
+
+def findDefinitions(word: str):
     url = f"https://fr.wiktionary.org/w/index.php?search={word}"
     try:
         return scrapDefinition(url)
     except:
         return None
 
+
 print(findDefinitions(word))
-
-
