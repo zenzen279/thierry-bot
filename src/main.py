@@ -19,7 +19,7 @@ load_dotenv()
 
 DISCORD_TOKEN = getenv("DISCORD_TOKEN")
 
-PREFIX = "/"
+PREFIX = ";"
 
 words, dict_words_accents = readWordsJSON("../public/words.json")
 

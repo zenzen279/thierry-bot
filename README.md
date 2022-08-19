@@ -5,7 +5,9 @@ J'ai effectué quelques corrections et améliorations. Si ce fork vous plaît, n
 
 N'ayant pas pu récupéré les icones d'origine, j'ai remplacé l'utilisation d'emoji customs par du texte. C'est moins joli mais ça fonctionne partout.
 
-De plus, j'ai ajouté un serveur web pour que l'app puisse tourner en continu et être déployée sur Render.
+De plus, j'ai ajouté un serveur web pour que l'app puisse tourner en continu et être déployée sur Render ou autres système du même genre.
+
+Ce readme est également nouveau.
 
 ## Commandes
   - `;help` Affiche l'aide.
@@ -16,9 +18,10 @@ De plus, j'ai ajouté un serveur web pour que l'app puisse tourner en continu et
   - `;stop` Arrête la partie.
 
 ## Installation et déploiement sur Render
+Render propose une offre gratuite suffisante pour héberger le bot pour une installation sur un serveur discord.
 
 ### Fork
-- Créer un Fork de ce repository sur GitHub
+- Créer un Fork de ce repository sur GitHub : https://docs.github.com/en/get-started/quickstart/fork-a-repo
 
 ### Créer un bot sur Discord
 
@@ -28,7 +31,6 @@ De plus, j'ai ajouté un serveur web pour que l'app puisse tourner en continu et
 - Le restant peut être modifié à loisir ("Rich Presence"...)
 
 ### Déploiement sur Render
-Render propose une offre gratuite suffisante pour héberger le bot pour une installation sur un serveur discord.
 
   - Aller sur https://render.com
   - Créer un compte
@@ -39,7 +41,8 @@ Render propose une offre gratuite suffisante pour héberger le bot pour une inst
     - `PYTHON_VERSION`: 3.10.4
   - Build command: `pip install -r requirements.txt`
   - Start command: `python3 src/main.py`
-  - Le build et le déploiement doit s'effectuer automatiquement
+  - Health Check Path: `/healthcheck`
+  - Le build et le déploiement doivent s'effectuer automatiquement.
 
 ## Test du bot
   - Retourner sur la configuration de l'application sur Discord et aller dans "OAuth2 URL Generator"
